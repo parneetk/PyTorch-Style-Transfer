@@ -99,6 +99,13 @@ def optimize(args):
 	output = Variable(content_image.data, requires_grad=True)
 	optimizer = Adam([output], lr=args.lr)
 	mse_loss = torch.nn.MSELoss()
+	#modify the feature map using gain
+	f_xs_s = Variable(features_content[1].data, requires_grad=False)
+	g_min = 0.7
+	g_max = 5
+	gain = f_xs_s / (f_xc_c + 10e-4)
+	gain_clamped = torch.clamp(gain, min=g_min, max=g_max)
+	f_modified = f_xc_c * gain
 	# optimizing the images
 	for e in range(args.iters):
 		utils.add_imagenet_mean_batch(output)
@@ -107,7 +114,7 @@ def optimize(args):
 
 		optimizer.zero_grad()
 		features_y = vgg(output)
-		content_loss = args.content_weight * mse_loss(features_y[1], f_xc_c)
+		content_loss = args.content_weight * mse_loss(features_y[1], f_modified)
 
 		style_loss = 0.
 		for m in range(len(features_y)):

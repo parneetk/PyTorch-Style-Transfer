@@ -46,4 +46,5 @@ class Vgg16(torch.nn.Module):
         h = F.relu(self.conv4_3(h))
         relu4_3 = h
 
-        return [relu1_2, relu2_2, relu3_3, relu4_3]
+        #return [relu1_2, relu2_2, relu3_3, relu4_3]
+        return [relu3_3, relu4_3]
